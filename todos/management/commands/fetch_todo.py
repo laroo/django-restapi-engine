@@ -9,7 +9,19 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write(f"Time: {datetime.now()}")
 
-        Todo.objects.using('restapi').get(pk=1)
+        # import pdb;
+        # pdb.set_trace()
+        # todo = Todo.objects.get(pk=1)
+        # print(todo)
+        # todo.title = f"{todo.title}!"
+        # todo.save()
+        print("="*100)
+        print("=" * 100)
+        print("=" * 100)
+        todo = Todo.objects.using('restapi').get(pk=1)
+        print(todo)
+        todo.title = f"{todo.title}!"
+        todo.save(using="restapi")
 
         # todo = Todo(
         #     user_id=123,

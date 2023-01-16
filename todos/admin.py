@@ -5,7 +5,8 @@ from .models import Todo
 
 class RestApiModelAdmin(admin.ModelAdmin):
     # A handy constant for the name of the alternate database.
-    using = 'restapi'
+    # using = 'restapi'
+    using = 'default'
 
     def save_model(self, request, obj, form, change):
         # Tell Django to save objects to the 'other' database.

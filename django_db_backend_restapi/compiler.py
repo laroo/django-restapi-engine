@@ -25,27 +25,33 @@ from django.db.models.sql.subqueries import UpdateQuery
 from django.utils.module_loading import import_string
 from .rest_api_handler import BaseRestApiHandler
 
+from django.db.models.sql.compiler import SQLCompiler as DefaultSQLCompiler
+from django.db.models.sql.compiler import SQLUpdateCompiler as DefaultSQLUpdateCompiler
+from django.db.models.sql.compiler import SQLInsertCompiler as DefaultSQLInsertCompiler
+from django.db.models.sql.compiler import SQLDeleteCompiler as DefaultSQLDeleteCompiler
 
-class SQLBaseCompiler:
+from django.db.models.expressions import Col
+from django.db.models.lookups import Exact
+
+from django.db.models.sql.subqueries import UpdateQuery
+
+
+class RestApiCompilerMixin:
 
     def __init__(self,
                  query: "django.db.models.sql.query.Query",
                  connection: "django_db_backend_restapi.base.DatabaseWrapper",
                  using: str
                  ):
-        print("CUSTOM COMPILER")
-        print(self.__class__.__name__)
-
-        self.query = query
-        self.connection = connection
-        self.using = using
+        super().__init__(query, connection, using)
 
         default_handler_class = self.connection.settings_dict['DEFAULT_HANDLER_CLASS']
         handler_class = import_string(default_handler_class)
         self.handler: BaseRestApiHandler = handler_class()
 
 
-class SQLCompiler(SQLBaseCompiler):
+class SQLCompiler(RestApiCompilerMixin, DefaultSQLCompiler):
+
 
     def execute_sql(self, result_type=MULTI, chunked_fetch=False, chunk_size=GET_ITERATOR_CHUNK_SIZE):
         """
@@ -60,87 +66,33 @@ class SQLCompiler(SQLBaseCompiler):
         is needed, as the filters describe an empty set. In that case, None is
         returned, to avoid any unnecessary database interaction.
         """
+        self.pre_sql_setup()
+
+        print('select', self.select)
+        print('annotation_col_map', self.annotation_col_map)
+        print('klass_info', self.klass_info)
+        print('_meta_ordering', self._meta_ordering)
+
         model = self.query.model
         model_pk_field = model._meta.pk
 
-        from django.db.models.expressions import Col
-        from django.db.models.lookups import Exact
         single_where_node = self.query.where.children[0] if self.query.where and len(self.query.where.children) == 1 else None
 
         if isinstance(single_where_node, Exact) and single_where_node.lhs.target == model_pk_field:
-            print("GET ID")
-            print(single_where_node.rhs)
-            return self.handler.get(model=model, pk=single_where_node.rhs)
+            row = self.handler.get(model=model, pk=single_where_node.rhs, columns=self.select)
+            return iter([[row]])
 
-        return
-
-        import pdb; pdb.set_trace()
-
-        result_type = result_type or NO_RESULTS
-        try:
-            # sql, params = self.as_sql()
-            sql = "DUMMY"
-            params = {}
-            if not sql:
-                raise EmptyResultSet
-        except EmptyResultSet:
-            if result_type == MULTI:
-                return iter([])
-            else:
-                return
-        if chunked_fetch:
-            cursor = self.connection.chunked_cursor()
-        else:
-            cursor = self.connection.cursor()
-        try:
-            cursor.execute(sql, params)
-        except Exception:
-            # Might fail for server-side cursors (e.g. connection closed)
-            cursor.close()
-            raise
-
-        if result_type == CURSOR:
-            # Give the caller the cursor to process and close.
-            return cursor
-        if result_type == SINGLE:
-            try:
-                val = cursor.fetchone()
-                if val:
-                    return val[0:self.col_count]
-                return val
-            finally:
-                # done with the cursor
-                cursor.close()
-        if result_type == NO_RESULTS:
-            cursor.close()
-            return
-
-        result = cursor_iter(
-            cursor, self.connection.features.empty_fetchmany_value,
-            self.col_count if self.has_extra_select else None,
-            chunk_size,
-        )
-        if not chunked_fetch or not self.connection.features.can_use_chunked_reads:
-            try:
-                # If we are using non-chunked reads, we return the same data
-                # structure as normally, but ensure it is all read into memory
-                # before going any further. Use chunked_fetch if requested,
-                # unless the database doesn't support it.
-                return list(result)
-            finally:
-                # done with the cursor
-                cursor.close()
-        return result
+        raise NotImplementedError("Sorry, SELECT still todo")
 
 
-class SQLInsertCompiler(SQLBaseCompiler):
+class SQLInsertCompiler(RestApiCompilerMixin, DefaultSQLInsertCompiler):
 
     def execute_sql(self, returning_fields=None):
         self.handler.insert(self.query)
         return []
 
 
-class SQLDeleteCompiler(SQLBaseCompiler):
+class SQLDeleteCompiler(RestApiCompilerMixin, DefaultSQLDeleteCompiler):
 
     def execute_sql(self, result_type=MULTI, chunked_fetch=False, chunk_size=GET_ITERATOR_CHUNK_SIZE):
         """
@@ -158,23 +110,22 @@ class SQLDeleteCompiler(SQLBaseCompiler):
         pass
 
 
-class SQLUpdateCompiler(SQLBaseCompiler):
+class SQLUpdateCompiler(RestApiCompilerMixin, DefaultSQLUpdateCompiler):
 
     def execute_sql(self, result_type):
-        return 1
+        self.pre_sql_setup()
+        self.query: UpdateQuery
+
+        model = self.query.model
+        model_pk_field = model._meta.pk
+
+        single_where_node = self.query.where.children[0] if self.query.where and len(self.query.where.children) == 1 else None
+
+        if isinstance(single_where_node, Exact) and single_where_node.lhs.target == model_pk_field:
+            num_rows_updated = self.handler.update(model=model, pk=single_where_node.rhs, values=self.query.values)
+            return num_rows_updated
+        raise NotImplementedError("Unsupported UPDATE")
 
 
-class SQLAggregateCompiler(SQLBaseCompiler):
+class SQLAggregateCompiler(RestApiCompilerMixin, DefaultSQLCompiler):
     pass
-
-
-def cursor_iter(cursor, sentinel, col_count, itersize):
-    """
-    Yield blocks of rows from a cursor and ensure the cursor is closed when
-    done.
-    """
-    try:
-        for rows in iter((lambda: cursor.fetchmany(itersize)), sentinel):
-            yield rows if col_count is None else [r[:col_count] for r in rows]
-    finally:
-        cursor.close()
