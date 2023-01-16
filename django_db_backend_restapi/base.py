@@ -8,19 +8,6 @@ from django.db.backends.base.features import BaseDatabaseFeatures
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
 
-from .cursor import Cursor
-
-
-class RestApiClient:
-
-    def connect(self, **kwargs):
-        print("RestApiClient::connect")
-        print(kwargs)
-        return self
-
-    def close(self):
-        print("RestApiClient::close")
-
 
 class Database(object):
     class Error(Exception):
@@ -118,6 +105,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         # TODO: Need to implement this fully
         return ['ALTER TABLE']
 
+
 class DatabaseWrapper(BaseDatabaseWrapper):
     vendor = 'restapi'
     display_name = 'RestAPI'
@@ -149,7 +137,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     }
 
     def __init__(self, *args, **kwargs):
-        self.restapi_client = None
         super().__init__(*args, **kwargs)
 
     def is_usable(self):
@@ -185,18 +172,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def get_new_connection(self, connection_params):
         name = connection_params.pop('name')
-        # To prevent leaving unclosed connections behind,
-        # client_conn must be closed before a new connection
-
-        if self.restapi_client is not None:
-            self.restapi_client.close()
-
-        self.restapi_client = RestApiClient()
-        self.connection = self.restapi_client.connect(**connection_params)
-
-        # database = self.client_connection[name]
-        # self.djongo_connection = DjongoClient(database, es)
-        # return self.client_connection[name]
 
         print("CONNECTION")
         print(self.connection)
@@ -213,12 +188,6 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def init_connection_state(self):
         pass
-
-    def create_cursor(self, name=None):
-        """
-        Returns an active connection cursor to the database.
-        """
-        return Cursor(self.connection)
 
     def _close(self):
         """

@@ -1,4 +1,5 @@
 import collections
+import pdb
 import re
 from functools import partial
 from itertools import chain
@@ -31,9 +32,9 @@ from django.db.models.sql.compiler import SQLInsertCompiler as DefaultSQLInsertC
 from django.db.models.sql.compiler import SQLDeleteCompiler as DefaultSQLDeleteCompiler
 
 from django.db.models.expressions import Col
-from django.db.models.lookups import Exact
+from django.db.models.lookups import Exact, In
 
-from django.db.models.sql.subqueries import UpdateQuery
+from django.db.models.sql.subqueries import UpdateQuery, InsertQuery, DeleteQuery
 
 
 class RestApiCompilerMixin:
@@ -68,10 +69,10 @@ class SQLCompiler(RestApiCompilerMixin, DefaultSQLCompiler):
         """
         self.pre_sql_setup()
 
-        print('select', self.select)
-        print('annotation_col_map', self.annotation_col_map)
-        print('klass_info', self.klass_info)
-        print('_meta_ordering', self._meta_ordering)
+        # print('select', self.select)
+        # print('annotation_col_map', self.annotation_col_map)
+        # print('klass_info', self.klass_info)
+        # print('_meta_ordering', self._meta_ordering)
 
         model = self.query.model
         model_pk_field = model._meta.pk
@@ -88,26 +89,33 @@ class SQLCompiler(RestApiCompilerMixin, DefaultSQLCompiler):
 class SQLInsertCompiler(RestApiCompilerMixin, DefaultSQLInsertCompiler):
 
     def execute_sql(self, returning_fields=None):
-        self.handler.insert(self.query)
-        return []
+        self.pre_sql_setup()
+        self.query: InsertQuery
+
+        model = self.query.model
+
+        assert len(self.query.objs) == 1
+
+        row = self.handler.insert(model=model, obj=self.query.objs[0], fields=self.query.fields, returning_fields=returning_fields)
+        return [row]
 
 
 class SQLDeleteCompiler(RestApiCompilerMixin, DefaultSQLDeleteCompiler):
 
     def execute_sql(self, result_type=MULTI, chunked_fetch=False, chunk_size=GET_ITERATOR_CHUNK_SIZE):
-        """
-        Run the query against the database and return the result(s). The
-        return value is a single data item if result_type is SINGLE, or an
-        iterator over the results if the result_type is MULTI.
+        self.pre_sql_setup()
+        self.query: DeleteQuery
 
-        result_type is either MULTI (use fetchmany() to retrieve all rows),
-        SINGLE (only retrieve a single row), or None. In this last case, the
-        cursor is returned if any query is executed, since it's used by
-        subclasses such as InsertQuery). It's possible, however, that no query
-        is needed, as the filters describe an empty set. In that case, None is
-        returned, to avoid any unnecessary database interaction.
-        """
-        pass
+        model = self.query.model
+        model_pk_field = model._meta.pk
+
+        single_where_node = self.query.where.children[0] if self.query.where and len(self.query.where.children) == 1 else None
+
+        if isinstance(single_where_node, Exact) and single_where_node.lhs.target == model_pk_field:
+            self.handler.delete(model=model, pk=single_where_node.rhs)
+        elif isinstance(single_where_node, In) and single_where_node.lhs.target == model_pk_field:
+            for pk in single_where_node.rhs:
+                self.handler.delete(model=model, pk=pk)
 
 
 class SQLUpdateCompiler(RestApiCompilerMixin, DefaultSQLUpdateCompiler):

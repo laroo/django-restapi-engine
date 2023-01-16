@@ -7,11 +7,11 @@ class BaseRestApiHandler:
     def get(self, *, model, pk, columns):
         raise NotImplementedError
 
-    def insert(self, query):
+    def insert(self, *, model, obj, fields, returning_fields):
         raise NotImplementedError
 
     def update(self, *, model, pk, values):
         raise NotImplementedError
 
-    def delete(self):
+    def delete(self, *, model, pk):
         raise NotImplementedError

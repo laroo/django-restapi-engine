@@ -7,10 +7,21 @@ class TodoRestApiHandler(BaseRestApiHandler):
 
     COLUMN_MAPPING = {'user_id': 'userId'}  # Model -> API
 
-    def insert(self, *, model, values):
-        print("--- INSERT ---")
-        print(model)
-        print(values)
+    def insert(self, *, model, obj, fields, returning_fields):
+
+        data = {}
+        for field in fields:
+            data[self.COLUMN_MAPPING.get(field.name, field.name)] = getattr(obj, field.name)
+
+        r = requests.post(f"https://jsonplaceholder.typicode.com/todos", json=data)
+        if r.status_code == 201:
+            row = r.json()
+
+            output = []
+            for field in returning_fields:
+                output.append(row[self.COLUMN_MAPPING.get(field.name, field.name)])
+
+            return output
 
     def get(self, *, model, pk, columns):
         """
@@ -49,3 +60,8 @@ class TodoRestApiHandler(BaseRestApiHandler):
             return 1
 
         return 0
+
+    def delete(self, *, model, pk):
+        r = requests.delete(f"https://jsonplaceholder.typicode.com/todos/{pk}")
+        if r.status_code == 200:
+            return
