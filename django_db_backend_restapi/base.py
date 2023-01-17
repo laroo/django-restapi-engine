@@ -172,10 +172,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
 
     def get_new_connection(self, connection_params):
         name = connection_params.pop('name')
-
-        print("CONNECTION")
-        print(self.connection)
-
+        self.connection = name
         return self.connection
 
     def _set_autocommit(self, autocommit):
@@ -193,10 +190,8 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         """
         Closes the client connection to the database.
         """
-        # if self.connection:
-        #     with self.wrap_database_errors:
-        #         self.connection.client.close()
-        pass
+        if self.connection:
+            self.connection = None
 
     def _rollback(self):
         raise NotImplementedError

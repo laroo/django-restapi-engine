@@ -30,8 +30,8 @@ class Command(BaseCommand):
         todo.save(using="restapi")
         print(todo)
 
-        # query = Todo.objects.using('restapi')
-        # self.stdout.write(f"count: {query.count()}")
-        #
-        # for todo in query:
-        #     self.stdout.write(str(todo))
+        query = Todo.objects.using('restapi')
+        self.stdout.write(f"count: {query.count()}")
+
+        for todo in query:
+            self.stdout.write(str(todo))

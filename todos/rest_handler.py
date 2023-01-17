@@ -1,5 +1,6 @@
 from typing import Optional
 from django_db_backend_restapi.rest_api_handler import BaseRestApiHandler
+from django.db.models.aggregates import Count
 import requests
 
 
@@ -65,3 +66,29 @@ class TodoRestApiHandler(BaseRestApiHandler):
         r = requests.delete(f"https://jsonplaceholder.typicode.com/todos/{pk}")
         if r.status_code == 200:
             return
+
+    def list(self, *, model, columns, query):
+        """
+        columns:
+        [
+            (Col(todos_todo, todos.Todo.id), ('"todos_todo"."id"', []), None),
+            (Col(todos_todo, todos.Todo.user_id), ('"todos_todo"."user_id"', []), None),
+            (Col(todos_todo, todos.Todo.title), ('"todos_todo"."title"', []), None),
+            (Col(todos_todo, todos.Todo.completed), ('"todos_todo"."completed"', []), None)
+        ]
+        """
+        r = requests.get(f"https://jsonplaceholder.typicode.com/todos?_limit=8")
+        if r.status_code == 200:
+            rows = r.json()
+
+        if len(columns) == 1 and isinstance(columns[0][0], Count):
+            return len(rows)
+
+        output = []
+        for row in rows:
+            row_output = []
+            for col, _, _ in columns:
+                row_output.append(row[self.COLUMN_MAPPING.get(col.target.name, col.target.name)])
+            output.append(row_output)
+
+        return output

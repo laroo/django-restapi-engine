@@ -69,11 +69,6 @@ class SQLCompiler(RestApiCompilerMixin, DefaultSQLCompiler):
         """
         self.pre_sql_setup()
 
-        # print('select', self.select)
-        # print('annotation_col_map', self.annotation_col_map)
-        # print('klass_info', self.klass_info)
-        # print('_meta_ordering', self._meta_ordering)
-
         model = self.query.model
         model_pk_field = model._meta.pk
 
@@ -83,7 +78,8 @@ class SQLCompiler(RestApiCompilerMixin, DefaultSQLCompiler):
             row = self.handler.get(model=model, pk=single_where_node.rhs, columns=self.select)
             return iter([[row]])
 
-        raise NotImplementedError("Sorry, SELECT still todo")
+        rows = self.handler.list(model=model, columns=self.select, query=self.query)
+        return iter([rows])
 
 
 class SQLInsertCompiler(RestApiCompilerMixin, DefaultSQLInsertCompiler):
