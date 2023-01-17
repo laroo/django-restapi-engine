@@ -1,5 +1,5 @@
 from typing import Optional
-from django_db_backend_restapi.rest_api_handler import BaseRestApiHandler
+from django_restapi_engine.rest_api_handler import BaseRestApiHandler
 from django.db.models.aggregates import Count
 import requests
 

@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-lcd1iyaj5nizq^ni4t00-g)86%l1a$z!!=f!^2xgc*4kcgtxr5'
+SECRET_KEY = 'django-insecure-fake-secret-key'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -80,7 +80,7 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     },
     'restapi': {
-        'ENGINE': 'django_db_backend_restapi',
+        'ENGINE': 'django_restapi_engine',
         'DEFAULT_HANDLER_CLASS': 'todos.rest_handler.TodoRestApiHandler'
     }
 }
