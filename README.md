@@ -4,7 +4,7 @@ Use any RestAPI as basic Django Database Engine
 
 ## About
 
-A basic Django database engine that interfaces with any RestAPI and perform basic CRUD actions
+A simple Django database engine that interfaces with any RestAPI and perform basic CRUD actions
 
 ## Usage
 

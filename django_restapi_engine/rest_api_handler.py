@@ -1,6 +1,4 @@
-
 class BaseRestApiHandler:
-
     def list(self, *, model, columns, query):
         raise NotImplementedError
 

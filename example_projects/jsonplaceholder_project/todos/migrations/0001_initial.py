@@ -7,20 +7,19 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Todo',
+            name="Todo",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('user_id', models.IntegerField(default=0)),
-                ('title', models.CharField(max_length=200)),
-                ('completed', models.BooleanField(default=True)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("user_id", models.IntegerField(default=0)),
+                ("title", models.CharField(max_length=200)),
+                ("completed", models.BooleanField(default=True)),
             ],
             options={
-                'managed': False,
+                "managed": False,
             },
         ),
     ]

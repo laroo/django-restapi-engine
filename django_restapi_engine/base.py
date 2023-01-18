@@ -1,12 +1,13 @@
-import datetime, calendar
+import calendar
+import datetime
 
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.base.client import BaseDatabaseClient
 from django.db.backends.base.creation import BaseDatabaseCreation
-from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 from django.db.backends.base.features import BaseDatabaseFeatures
-from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends.base.introspection import BaseDatabaseIntrospection
+from django.db.backends.base.operations import BaseDatabaseOperations
+from django.db.backends.base.schema import BaseDatabaseSchemaEditor
 
 
 class Database(object):
@@ -78,7 +79,7 @@ class DatabaseOperations(BaseDatabaseOperations):
             return None
 
         if isinstance(value, str):
-            return datetime.datetime.strptime(value, '%H:%M:%S')
+            return datetime.datetime.strptime(value, "%H:%M:%S")
 
         return datetime.datetime(1900, 1, 1, value.hour, value.minute, value.second, value.microsecond)
 
@@ -95,20 +96,20 @@ class DatabaseOperations(BaseDatabaseOperations):
     def get_db_converters(self, expression):
         converters = super(DatabaseOperations, self).get_db_converters(expression)
         internal_type = expression.output_field.get_internal_type()
-        if internal_type == 'DateField':
+        if internal_type == "DateField":
             converters.append(self.convert_datefield_value)
-        elif internal_type == 'TimeField':
+        elif internal_type == "TimeField":
             converters.append(self.convert_timefield_value)
         return converters
 
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
         # TODO: Need to implement this fully
-        return ['ALTER TABLE']
+        return ["ALTER TABLE"]
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
-    vendor = 'restapi'
-    display_name = 'RestAPI'
+    vendor = "restapi"
+    display_name = "RestAPI"
 
     SchemaEditorClass = BaseDatabaseSchemaEditor
     Database = Database
@@ -116,24 +117,24 @@ class DatabaseWrapper(BaseDatabaseWrapper):
     client_class = BaseDatabaseClient
     creation_class = BaseDatabaseCreation
     features_class = DatabaseFeatures
-    introspection_class = DatabaseIntrospection 
+    introspection_class = DatabaseIntrospection
     ops_class = DatabaseOperations
 
     operators = {
-        'exact': '= %s',
-        'iexact': 'iLIKE %.*s',
-        'contains': 'LIKE %s',
-        'icontains': 'iLIKE %s',
-        'regex': 'REGEXP BINARY %s',
-        'iregex': 'REGEXP %s',
-        'gt': '> %s',
-        'gte': '>= %s',
-        'lt': '< %s',
-        'lte': '<= %s',
-        'startswith': 'LIKE %s',
-        'endswith': 'LIKE %s',
-        'istartswith': 'iLIKE %s',
-        'iendswith': 'iLIKE %s',
+        "exact": "= %s",
+        "iexact": "iLIKE %.*s",
+        "contains": "LIKE %s",
+        "icontains": "iLIKE %s",
+        "regex": "REGEXP BINARY %s",
+        "iregex": "REGEXP %s",
+        "gt": "> %s",
+        "gte": ">= %s",
+        "lt": "< %s",
+        "lte": "<= %s",
+        "startswith": "LIKE %s",
+        "endswith": "LIKE %s",
+        "istartswith": "iLIKE %s",
+        "iendswith": "iLIKE %s",
     }
 
     def __init__(self, *args, **kwargs):
@@ -151,14 +152,11 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         default values to blank fields.
         """
         valid_settings = {
-            'NAME': 'name',
-            'URL': 'url',
-            'AUTH_TOKEN': 'auth_token',
+            "NAME": "name",
+            "URL": "url",
+            "AUTH_TOKEN": "auth_token",
         }
-        connection_params = {
-            'name': 'restapi_test',
-            'enforce_schema': True
-        }
+        connection_params = {"name": "restapi_test", "enforce_schema": True}
         for setting_name, kwarg in valid_settings.items():
             try:
                 setting = self.settings_dict[setting_name]
@@ -171,7 +169,7 @@ class DatabaseWrapper(BaseDatabaseWrapper):
         return connection_params
 
     def get_new_connection(self, connection_params):
-        name = connection_params.pop('name')
+        name = connection_params.pop("name")
         self.connection = name
         return self.connection
 

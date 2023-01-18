@@ -1,12 +1,14 @@
 from typing import Optional
-from django_restapi_engine.rest_api_handler import BaseRestApiHandler
-from django.db.models.aggregates import Count
+
 import requests
+from django.db.models.aggregates import Count
+
+from django_restapi_engine.rest_api_handler import BaseRestApiHandler
 
 
 class TodoRestApiHandler(BaseRestApiHandler):
 
-    COLUMN_MAPPING = {'user_id': 'userId'}  # Model -> API
+    COLUMN_MAPPING = {"user_id": "userId"}  # Model -> API
 
     def insert(self, *, model, obj, fields, returning_fields):
 
@@ -14,7 +16,7 @@ class TodoRestApiHandler(BaseRestApiHandler):
         for field in fields:
             data[self.COLUMN_MAPPING.get(field.name, field.name)] = getattr(obj, field.name)
 
-        r = requests.post(f"https://jsonplaceholder.typicode.com/todos", json=data)
+        r = requests.post("https://jsonplaceholder.typicode.com/todos", json=data)
         if r.status_code == 201:
             row = r.json()
 
@@ -44,7 +46,6 @@ class TodoRestApiHandler(BaseRestApiHandler):
             output.append(row[self.COLUMN_MAPPING.get(col.target.name, col.target.name)])
 
         return output
-
 
     def update(self, *, model, pk, values) -> Optional[int]:
         """
@@ -77,7 +78,7 @@ class TodoRestApiHandler(BaseRestApiHandler):
             (Col(todos_todo, todos.Todo.completed), ('"todos_todo"."completed"', []), None)
         ]
         """
-        r = requests.get(f"https://jsonplaceholder.typicode.com/todos?_limit=8")
+        r = requests.get("https://jsonplaceholder.typicode.com/todos?_limit=8")
         if r.status_code == 200:
             rows = r.json()
 

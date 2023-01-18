@@ -3,7 +3,7 @@
 
 This example project uses the `Todo` rest API from [JSONPlaceholder](https://jsonplaceholder.typicode.com/)
 
-Please note that this API is readonly and changes (insert, update & delete) won't be applied! 
+Please note that this API is readonly and changes (insert, update & delete) won't be applied!
 
 ## Running example project
 
