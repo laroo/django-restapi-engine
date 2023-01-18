@@ -5,7 +5,7 @@ This example project uses the `Todo` rest API from [JSONPlaceholder](https://jso
 
 Please note that this API is readonly and changes (insert, update & delete) won't be applied!
 
-![](https://github.com/laroo/django-restapi-engine/example_projects/jsonplaceholder_project/django-admin-demo.gif)
+![](https://github.com/laroo/django-restapi-engine/blob/main/example_projects/jsonplaceholder_project/django-admin-demo.gif)
 
 ## Running example project
 
