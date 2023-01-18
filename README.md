@@ -6,6 +6,8 @@ Use any RestAPI as basic Django Database Engine
 
 A simple Django database engine that interfaces with any RestAPI and perform basic CRUD actions
 
+![](https://github.com/laroo/django-restapi-engine/example_projects/jsonplaceholder_project/django-admin-demo.gif)
+
 ## Usage
 
 ### Installation

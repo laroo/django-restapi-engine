@@ -30,5 +30,5 @@ class Command(BaseCommand):
         query = Todo.objects.using("restapi")
         self.stdout.write(f"count: {query.count()}")
 
-        for todo in query:
+        for todo in query[:15]:
             self.stdout.write(str(todo))

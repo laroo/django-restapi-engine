@@ -1,4 +1,5 @@
 from typing import Optional
+from urllib.parse import urlencode
 
 import requests
 from django.db.models.aggregates import Count
@@ -8,7 +9,7 @@ from django_restapi_engine.rest_api_handler import BaseRestApiHandler
 
 class TodoRestApiHandler(BaseRestApiHandler):
 
-    COLUMN_MAPPING = {"user_id": "userId"}  # Model -> API
+    COLUMN_MAPPING = {"pk": "id", "user_id": "userId"}  # Model -> API
 
     def insert(self, *, model, obj, fields, returning_fields):
 
@@ -17,14 +18,16 @@ class TodoRestApiHandler(BaseRestApiHandler):
             data[self.COLUMN_MAPPING.get(field.name, field.name)] = getattr(obj, field.name)
 
         r = requests.post("https://jsonplaceholder.typicode.com/todos", json=data)
-        if r.status_code == 201:
-            row = r.json()
+        if r.status_code != 201:
+            raise ValueError("Unexpected response status code %s when inserting record", r.status_code)
 
-            output = []
-            for field in returning_fields:
-                output.append(row[self.COLUMN_MAPPING.get(field.name, field.name)])
+        row = r.json()
 
-            return output
+        output = []
+        for field in returning_fields:
+            output.append(row[self.COLUMN_MAPPING.get(field.name, field.name)])
+
+        return output
 
     def get(self, *, model, pk, columns):
         """
@@ -38,9 +41,10 @@ class TodoRestApiHandler(BaseRestApiHandler):
         ]
         """
         r = requests.get(f"https://jsonplaceholder.typicode.com/todos/{pk}")
-        if r.status_code == 200:
-            row = r.json()
+        if r.status_code != 200:
+            raise ValueError("Unexpected response status code %s when fetching record", r.status_code)
 
+        row = r.json()
         output = []
         for col, _, _ in columns:
             output.append(row[self.COLUMN_MAPPING.get(col.target.name, col.target.name)])
@@ -58,18 +62,20 @@ class TodoRestApiHandler(BaseRestApiHandler):
             data[self.COLUMN_MAPPING.get(col.name, col.name)] = value
 
         r = requests.put(f"https://jsonplaceholder.typicode.com/todos/{pk}", json=data)
-        if r.status_code == 200:
-            return 1
+        if r.status_code != 200:
+            raise ValueError("Unexpected response status code %s when updating record", r.status_code)
 
-        return 0
+        return 1
 
     def delete(self, *, model, pk):
         r = requests.delete(f"https://jsonplaceholder.typicode.com/todos/{pk}")
-        if r.status_code == 200:
-            return
+        if r.status_code != 200:
+            raise ValueError("Unexpected response status code %s when deleting record", r.status_code)
 
     def list(self, *, model, columns, query):
         """
+        Supported API features: https://github.com/typicode/json-server
+
         columns:
         [
             (Col(todos_todo, todos.Todo.id), ('"todos_todo"."id"', []), None),
@@ -78,13 +84,37 @@ class TodoRestApiHandler(BaseRestApiHandler):
             (Col(todos_todo, todos.Todo.completed), ('"todos_todo"."completed"', []), None)
         ]
         """
-        r = requests.get("https://jsonplaceholder.typicode.com/todos?_limit=8")
-        if r.status_code == 200:
-            rows = r.json()
-
         if len(columns) == 1 and isinstance(columns[0][0], Count):
-            return len(rows)
+            # Count
+            r = requests.get("https://jsonplaceholder.typicode.com/todos")
+            if r.status_code != 200:
+                raise ValueError("Unexpected response status code %s when counting records", r.status_code)
+            return len(r.json())
 
+        def build_fetch_url():
+            """
+            Extract ordering and offset/limit from query and convert it to RestAPI params
+            """
+            sort = {}
+            for sort_column in query.order_by:
+                # Django prepends a minus (-) to a sorting column to indicate it's reverse ordering
+                api_column = self.COLUMN_MAPPING.get(sort_column.lstrip("-"), sort_column.lstrip("-"))
+                sort[api_column] = "desc" if sort_column[:1] == "-" else "asc"
+
+            params = {
+                "_sort": ",".join(sort.keys()),
+                "_order": ",".join(sort.values()),
+                "_start": query.low_mark,
+                "_end": query.high_mark,
+            }
+            clean_params = {k: v for k, v in params.items() if v}  # Remove empty params
+            return f"https://jsonplaceholder.typicode.com/todos?{urlencode(clean_params)}"
+
+        r = requests.get(build_fetch_url())
+        if r.status_code != 200:
+            raise ValueError("Unexpected response status code %s when listing records", r.status_code)
+
+        rows = r.json()
         output = []
         for row in rows:
             row_output = []

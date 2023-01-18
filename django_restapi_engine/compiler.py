@@ -31,18 +31,6 @@ class RestApiCompilerMixin:
 
 class SQLCompiler(RestApiCompilerMixin, DefaultSQLCompiler):
     def execute_sql(self, result_type=MULTI, chunked_fetch=False, chunk_size=GET_ITERATOR_CHUNK_SIZE):
-        """
-        Run the query against the database and return the result(s). The
-        return value is a single data item if result_type is SINGLE, or an
-        iterator over the results if the result_type is MULTI.
-
-        result_type is either MULTI (use fetchmany() to retrieve all rows),
-        SINGLE (only retrieve a single row), or None. In this last case, the
-        cursor is returned if any query is executed, since it's used by
-        subclasses such as InsertQuery). It's possible, however, that no query
-        is needed, as the filters describe an empty set. In that case, None is
-        returned, to avoid any unnecessary database interaction.
-        """
         self.pre_sql_setup()
         self.query: Query
 
