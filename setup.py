@@ -9,7 +9,7 @@ with open(os.path.join(os.path.dirname(__file__), "README.md")) as readme_file:
 setup(
     name="django-restapi-engine",
     packages=[
-        "django_db_backend_restapi",
+        "django_restapi_engine",
     ],
     url="https://github.com/laroo/django-restapi-engine",
     project_urls={
