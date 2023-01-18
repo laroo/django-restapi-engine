@@ -58,8 +58,7 @@ class DatabaseFeatures(BaseDatabaseFeatures):
 
 
 class DatabaseOperations(BaseDatabaseOperations):
-    # compiler_module = "sqlany_django.compiler"
-    compiler_module = "django_db_backend_restapi.compiler"
+    compiler_module = "django_restapi_engine.compiler"
 
     def quote_name(self, name):
         if name.startswith('"') and name.endswith('"'):
@@ -103,8 +102,7 @@ class DatabaseOperations(BaseDatabaseOperations):
         return converters
 
     def sql_flush(self, style, tables, sequences, allow_cascade=False):
-        # TODO: Need to implement this fully
-        return ["ALTER TABLE"]
+        raise NotImplementedError
 
 
 class DatabaseWrapper(BaseDatabaseWrapper):
