@@ -9,7 +9,7 @@ def index(request):
     query = Todo.objects.using("restapi")
 
     out = ""
-    for todo in query:
+    for todo in query[:20]:
         out = (
             f'{out}<li><input type="checkbox" {"checked=checked" if todo.completed else ""} disabled="disabled" />'
             f"{escape(todo.title)} (user={todo.user_id})</li>"
