@@ -47,6 +47,7 @@ with the following settings:
 - `ENGINE`: Tell Django to use `django_restapi_engine`
 - `DEFAULT_HANDLER_CLASS`: Point to your custom RestAPI handler class created in previous step
 
+Example:
 
     DATABASES = {
         'default': {
@@ -58,6 +59,7 @@ with the following settings:
             'DEFAULT_HANDLER_CLASS': 'module.location.of.MyCustomRestApiHandler'
         }
     }
+
 
 ### Usage
 
