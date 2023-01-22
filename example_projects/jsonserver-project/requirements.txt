@@ -1,0 +1,4 @@
+-e ../../  # django-restapi-engine
+Django~=3.2
+PyYAML==6.*
+requests==2.*
