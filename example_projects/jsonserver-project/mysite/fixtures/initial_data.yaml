@@ -1,0 +1,15 @@
+- fields:
+    date_joined: 2023-01-01 06:30:00+00:00
+    email: admin@example.com
+    first_name: 'Rest'
+    groups: []
+    is_active: true
+    is_staff: true
+    is_superuser: true
+    last_login: 2023-01-01 06:30:00+00:00
+    last_name: 'API'
+    password: pbkdf2_sha256$12000$scfDItXHnci7$ZloMPgY2YAhaFelKGqZ7eJB3mCYbxwua8TxNnCerwP8=
+    user_permissions: []
+    username: admin
+  model: auth.user
+  pk: 1
