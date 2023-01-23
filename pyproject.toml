@@ -1,3 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "django-restapi-engine"
+dynamic = ["version"]
+description = "Use any RestAPI as basic Django Database Engine"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.7"
+authors = [
+    { name = "Jan-Age Laroo" },
+]
+classifiers = [
+    "Framework :: Django",
+    "Framework :: Django :: 3.2",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "Django~=3.2",
+]
+
+[project.urls]
+Documentation = "https://github.com/laroo/django-restapi-engine"
+Homepage = "https://github.com/laroo/django-restapi-engine"
+Source = "https://github.com/laroo/django-restapi-engine"
+Tracker = "https://github.com/laroo/django-restapi-engine/issues"
+
+[tool.hatch.version]
+path = "django_restapi_engine/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/django_restapi_engine",
+]
+
 [tool.black]
 line-length = 120
 target-version = ['py39']
