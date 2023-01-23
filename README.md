@@ -12,7 +12,15 @@ A simple Django database engine that interfaces with any RestAPI and perform bas
 
 ### Installation
 
-    pip install git+https://github.com/laroo/django-restapi-engine.git@v0.1.1
+
+Stable version:
+
+    pip install django-restapi-engine.git
+
+
+Development version:
+
+    pip install git+https://github.com/laroo/django-restapi-engine.git@main
 
 ### Create RestAPI handler
 
