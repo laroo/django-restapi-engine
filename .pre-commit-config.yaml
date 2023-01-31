@@ -24,14 +24,14 @@ repos:
       - "django-stubs==1.13.1"
       - "types-setuptools==65.7.0.2"
       - "types-requests==2.28.11.8"
-- repo: https://github.com/ambv/black
+- repo: https://github.com/psf/black
   rev: 22.12.0
   hooks:
   - id: black
     stages: ["commit"]
 
 - repo: https://github.com/pycqa/isort
-  rev: 5.11.3
+  rev: 5.12.0
   hooks:
   - id: isort
     name: isort
