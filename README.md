@@ -4,15 +4,18 @@ Use any RestAPI as basic Django Database Engine
 
 ## About
 
-A simple Django database engine that interfaces with any RestAPI and perform basic CRUD actions
+A simple Django database engine that interfaces with any RestAPI and perform basic CRUD actions.
 
 ![](https://raw.githubusercontent.com/laroo/django-restapi-engine/main/example_projects/jsonplaceholder_project/django-admin-demo.gif)
 
 ## Motivation
 
-To interact with rest API's I was creating scripts using `curl` or `Postman` UI. This is quite cumbersome and often fails as it's missing proper validation and a easy UI.
+To interact with rest API's I was creating scripts using `curl` or `Postman` UI. This is quite
+cumbersome and often fails as it's missing proper validation and a easy UI.
 
-With Django admin I was able to create a customizable CRUD interface in a few simple lines of code, but it only works on database backends. By defining a basic database engine that interfaces with any RestAPI I was able to leverage Django admin for my CRUD operations.
+With Django admin it's possible to create a customizable CRUD interface in a few simple lines of
+code, but it only works on database backends. Leveraging Django admin for CRUD operations by
+defining a basic database engine that interfaces with any RestAPI.
 
 ## Usage
 
