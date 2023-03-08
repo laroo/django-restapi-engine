@@ -8,11 +8,9 @@ from django_restapi_engine.rest_api_handler import BaseRestApiHandler
 
 
 class TodoRestApiHandler(BaseRestApiHandler):
-
     COLUMN_MAPPING = {"pk": "id", "user_id": "userId"}  # Model -> API
 
     def insert(self, *, model, obj, fields, returning_fields):
-
         data = {}
         for field in fields:
             data[self.COLUMN_MAPPING.get(field.name, field.name)] = getattr(obj, field.name)
