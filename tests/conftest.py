@@ -1,3 +1,27 @@
+from django_restapi_engine.rest_api_handler import BaseRestApiHandler
+
+
+class FakeRestApiHandler(BaseRestApiHandler):
+
+    def list(self, *, model, columns, query):
+        return [
+            {"id": 1, "title": "some title", "completed": False},
+            {"id": 2, "title": "another title", "completed": True},
+        ]
+
+    def get(self, *, model, pk, columns):
+        return {"id": 1, "title": "some title", "completed": False}
+
+    def insert(self, *, model, obj, fields, returning_fields):
+        return {"id": 3, "title": "new title"}
+
+    def update(self, *, model, pk, values):
+        return 1
+
+    def delete(self, *, model, pk):
+        return
+
+
 def pytest_configure():
     from django.conf import settings
 

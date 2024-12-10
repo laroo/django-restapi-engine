@@ -41,15 +41,15 @@ Create a custom RestAPI handler that implements all methods from `BaseRestApiHan
 
         def list(self, *, model, columns, query):
             return [
-                return {'id': 1`, 'title': 'some title'},
-                return {'id': 2`, 'title': 'another title'}
+                {'id': 1, 'title': 'some title'},
+                {'id': 2, 'title': 'another title'}
             ]
 
         def get(self, *, model, pk, columns):
-            return {'id': 1`, 'title': 'some title'}
+            return {'id': 1, 'title': 'some title'}
 
         def insert(self, *, model, obj, fields, returning_fields):
-            return {'id': 3`}
+            return {'id': 3}
 
         def update(self, *, model, pk, values):
             return 1

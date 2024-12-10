@@ -25,16 +25,14 @@ repos:
       - "types-setuptools==65.7.0.2"
       - "types-requests==2.28.11.8"
 - repo: https://github.com/psf/black
-  rev: 23.12.1
+  rev: 24.10.0
   hooks:
   - id: black
-    stages: ["commit"]
 
 - repo: https://github.com/pycqa/isort
   rev: 5.13.2
   hooks:
   - id: isort
-    name: isort
 
 - repo: https://github.com/pycqa/flake8
   rev: 6.1.0
