@@ -16,13 +16,8 @@ from .rest_api_handler import BaseRestApiHandler
 
 
 class RestApiCompilerMixin:
-    def __init__(
-        self,
-        query: Query,
-        connection: DatabaseWrapper,
-        using: str,
-    ):
-        super().__init__(query, connection, using)  # type: ignore
+    def __init__(self, query: Query, connection: DatabaseWrapper, using: str, *args, **kwargs):
+        super().__init__(query, connection, using, *args, **kwargs)  # type: ignore
 
         default_handler_class = connection.settings_dict["DEFAULT_HANDLER_CLASS"]
         handler_class = import_string(default_handler_class)

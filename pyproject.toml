@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "Use any RestAPI as basic Django Database Engine"
 readme = "README.md"
 license = "MIT"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 authors = [
     { name = "Jan-Age Laroo" },
 ]
@@ -67,8 +67,8 @@ cov = [
 # type = "container"
 
 [[tool.hatch.envs.all.matrix]]
-python = ["3.8", "3.9"]
-django = ["3.2", "4.0"]
+python = ["3.9", "3.10", "3.11"]
+django = ["3.2", "4.0", "4.2"]
 
 [tool.hatch.envs.all.overrides]
 matrix.django.dependencies = [
