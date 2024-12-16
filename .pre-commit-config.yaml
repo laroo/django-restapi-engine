@@ -1,6 +1,6 @@
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.5.0
+  rev: v5.0.0
   hooks:
   - id: end-of-file-fixer
   - id: mixed-line-ending
@@ -15,7 +15,7 @@ repos:
   - id: check-added-large-files
     args: ['--maxkb=1024']
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.8.0
+  rev: v1.13.0
   hooks:
   - id: mypy
     args:
@@ -35,6 +35,6 @@ repos:
   - id: isort
 
 - repo: https://github.com/pycqa/flake8
-  rev: 6.1.0
+  rev: 7.1.1
   hooks:
   - id: flake8
